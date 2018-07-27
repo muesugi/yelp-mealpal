@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "manifest_version": 2,
   "description": "Inject Yelp ratings into MealPal",
-  "homepage_url": "http://www.yelp.com", 
+  "homepage_url": "https://github.com/muesugi/yelp-mealpal",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -22,7 +22,8 @@
     "default_popup": "src/page_action/page_action.html"
   },
   "permissions": [
-    " https://api.yelp.com/*"
+    "http://api.yelp.com/v3/*",
+    "https://api.yelp.com/v3/*"
   ],
   "content_scripts": [
     {
@@ -38,8 +39,11 @@
         "https://secure.mealpal.com/lunch"
       ],
       "js": [
-        "js/jquery/jquery.min.js", "src/inject/inject.js"
+        "src/inject/inject.js"
       ]
     }
-  ]
+  ],
+  "web_accessible_resources": [
+      "icons/*"
+    ]
 }
