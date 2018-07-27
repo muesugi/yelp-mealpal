@@ -69,7 +69,7 @@ function tryToPopulateSavedLoc(document){
 	var cityScriptEl = document.createElement('script');
 	cityScriptEl.textContent = cityScript;
 	cityScriptEl.async = false;
-	document.head.appendChild(cityScriptEl);
+	document.body.appendChild(cityScriptEl);
 
 	 if (document.getElementsByClassName('yfm-city-container').length > 0){
 		city_container = document.getElementsByClassName('yfm-city-container')[0];
