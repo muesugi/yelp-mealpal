@@ -1,3 +1,5 @@
+saved_loc = {city: null, state: null, country: null}
+
 chrome.extension.sendMessage({}, function(response) {
 	var readyStateCheckInterval = setInterval(function() {
 	if (document.readyState === "complete") {
@@ -6,22 +8,7 @@ chrome.extension.sendMessage({}, function(response) {
 		var restaurantsLoadedInterval = setInterval(function(){
 			restaurants = document.querySelectorAll(".restaurant:not(."+injected_classname+")");
 			if (restaurants && restaurants.length > 0) {
-
-				//// THING THAT WORKS BUT IS REALLY SLOW ///
-				// count = 0
-				// restaurants.forEach(async(rnt) => {
-				// 	rnt.classList.add("yfm-yelp-rated");
-
-				// 	if (count < 5){
-				// 		await getAndUseBusinessYelpInfo(
-				// 				rnt,
-				// 				rnt.getElementsByClassName("name")[0].innerText,
-				// 				rnt.getElementsByClassName("address")[0].innerText
-				// 			)
-				// 	}
-				// 	count++
-				// })
-				//// \\\ end THING THAT WORKS BUT IS REALLY SLOW ///
+				if (!saved_loc.city) tryToPopulateSavedLoc(document);
 
 				restaurants_array = Array.from(restaurants);
 				for (let i = 0; i < restaurants_array.length; i++) {
@@ -35,13 +22,62 @@ chrome.extension.sendMessage({}, function(response) {
 
 					let name = rnt.getElementsByClassName("name")[0].innerText;
 					let address = rnt.getElementsByClassName("address")[0].innerText;
-					getAndUseBusinessYelpInfo(rnt, name, address)
+					getAndUseBusinessYelpInfo(
+						rnt,
+						name,
+						address,
+						saved_loc.city,
+						saved_loc.state,
+						saved_loc.country,
+					);
 				}
 			}
 		}, 10)
 	}
 	}, 10);
 });
+
+function tryToPopulateSavedLoc(document){
+	var cityScript = `
+		ang_element = angular.element( document.querySelector(".filters-wrapper"));
+		if (ang_element && ang_element.scope().city){
+			city_object = ang_element.scope().city;
+
+			city_container = document.createElement('div');
+			city_container.classList = 'yfm-hidden yfm-city-container';
+
+			city_data = document.createElement('span');
+			city_data.classList = 'yfm-city-city';
+			city_data.innerText = city_object.name;
+
+			state_data = document.createElement('span');
+			state_data.classList = 'yfm-city-state';
+			state_data.innerText = city_object.state;
+
+			country_data = document.createElement('span');
+			country_data.classList = 'yfm-city-country';
+			country_data.innerText = city_object.countryCodeAlphaTwo.toUpperCase();
+
+			city_container.append(city_data);
+			city_container.append(state_data);
+			city_container.append(country_data);
+
+			document.getElementById('app').append(city_container);
+		}
+	`;
+
+	var cityScriptEl = document.createElement('script');
+	cityScriptEl.textContent = cityScript;
+	cityScriptEl.async = false;
+	document.head.appendChild(cityScriptEl);
+
+	 if (document.getElementsByClassName('yfm-city-container').length > 0){
+		city_container = document.getElementsByClassName('yfm-city-container')[0];
+		saved_loc.city = city_container.getElementsByClassName('yfm-city-city')[0].innerText;
+		saved_loc.state = city_container.getElementsByClassName('yfm-city-state')[0].innerText;
+		saved_loc.country = city_container.getElementsByClassName('yfm-city-country')[0].innerText;
+	}
+}
 
 function starImage(nStars){
 	file_name = "icons/yelp_stars/regular_"

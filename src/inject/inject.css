@@ -11,3 +11,7 @@
 .yfm-star-review-count {
 	margin-left: .5em;
 }
+
+.yfm-hidden {
+	display: none;
+}
