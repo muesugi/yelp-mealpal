@@ -88,8 +88,17 @@ async function getAndUseBusinessYelpInfo(restaurantElement, name, address, city=
 				}
 			})
 			.catch((error) => {
-				console.log(error)
-				reject(error)
+				if (error.status == 404 || error.status == 400){
+					star_container = restaurantElement.getElementsByClassName("yfm-star-container")[0];
+					if (error.status == 404){
+						star_container.innerText = "Couldn't find this business on Yelp :(";
+					} else {
+						star_container.innerText = "This business has not been rated on Yelp!";
+					}
+				} else {
+					console.log(error);
+					reject(error);
+				}
 			});
 	});
 }
