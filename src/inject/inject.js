@@ -4,6 +4,7 @@ chrome.extension.sendMessage({}, function(response) {
 	var readyStateCheckInterval = setInterval(function() {
 	if (document.readyState === "complete") {
 		clearInterval(readyStateCheckInterval);
+		forceKitchenOpen(document);
 		injected_classname = "yfm-yelp-rated";
 		var restaurantsLoadedInterval = setInterval(function(){
 			restaurants = document.querySelectorAll(".restaurant:not(."+injected_classname+")");
@@ -36,6 +37,32 @@ chrome.extension.sendMessage({}, function(response) {
 	}
 	}, 10);
 });
+
+
+function forceKitchenOpen(document){
+	var script = `
+		forced = false
+		//window.__env.environment = "dev"
+		setInterval(function() {
+			scope = angular.element($(".kitchen--lunch")).scope();
+			if (scope && !forced){
+				scope.bigBoy.kitchenIsOpen = true;
+				scope.bigBoy.planner.mealpal_now = true;
+				weekdays = scope.bigBoy.planner.weekdays
+				scope.bigBoy.planner.weekdays[weekdays.length - 1].lunch.kitchen_mode = 'open';
+				scope.bigBoy.planner.weekdays[weekdays.length - 1].lunch.kitchen_status = 'OPEN';
+				scope.bigBoy.planner.weekdays[weekdays.length - 1].isReservable = true;
+				scope.bigBoy.planner.weekdays[weekdays.length - 1].reserve_until = "2018-07-27T023:00:00-07:00";
+				scope.$apply();
+				console.log(scope.bigBoy)
+				forced = true;
+			}
+		}, 100);
+	`;
+	var scriptEl = document.createElement('script');
+	scriptEl.textContent = script;
+	document.head.appendChild(scriptEl);
+}
 
 function tryToPopulateSavedLoc(document){
 	var cityScript = `
