@@ -84,11 +84,34 @@ async function getAndUseBusinessYelpInfo(restaurantElement, name, address, city=
 					review_count.append(review_count_text);
 					star_container.append(review_count);
 
+
+					overlayElement = restaurantElement.nextElementSibling;
+					checking = 0;
+					var isFadeBoxOverlay = ((element) => element.classList && element.classList.contains("fade-box--meal-overlay"));
+					while (!isFadeBoxOverlay(overlayElement) && checking < 3){
+						overlayElement = overlayElement.nextElementSibling;
+						checking++;
+					}
+					if( isFadeBoxOverlay(overlayElement) ){
+						linkToBusiness =  document.createElement('a');
+						linkToBusiness.appendChild(document.createTextNode("Open on Yelp!"));
+						linkToBusiness.href = "http://yelp.com/biz/" + response.alias;
+
+						linkToMealPalReviews =  document.createElement('a');
+						linkToMealPalReviews.appendChild(document.createTextNode("Read only MealPal reviews"));
+						linkToMealPalReviews.href = "http://yelp.com/biz/" + response.alias + "?q=MealPal";
+
+						overlayElement.insertBefore(linkToMealPalReviews,
+							overlayElement.getElementsByClassName("description")[0].nextElementSibling);
+
+						overlayElement.insertBefore(linkToBusiness,linkToMealPalReviews);
+					}
+
 					resolve(response);
 				}
 			})
 			.catch((error) => {
-				if (error.status == 404 || error.status == 400){
+				if (error.status >= 400 && error.status < 500){
 					star_container = restaurantElement.getElementsByClassName("yfm-star-container")[0];
 					if (error.status == 404){
 						star_container.innerText = "Couldn't find this business on Yelp :(";
