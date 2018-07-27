@@ -27,12 +27,15 @@ chrome.extension.sendMessage({}, function(response) {
 				for (let i = 0; i < restaurants_array.length; i++) {
 					let rnt = restaurants_array[i];
 					rnt.classList.add("yfm-yelp-rated");
+					star_container = document.createElement("div")
+					star_container.classList = "yfm-star-container";
+					star_container.innerText = "... loading reviews ...";
+					rnt.append(star_container);
 
-					if (i < 5){
-						let name = rnt.getElementsByClassName("name")[0].innerText;
-						let address = rnt.getElementsByClassName("address")[0].innerText;
-						getAndUseBusinessYelpInfo(rnt, name, address)
-					}
+
+					let name = rnt.getElementsByClassName("name")[0].innerText;
+					let address = rnt.getElementsByClassName("address")[0].innerText;
+					getAndUseBusinessYelpInfo(rnt, name, address)
 				}
 			}
 		}, 10)
@@ -68,17 +71,26 @@ async function getAndUseBusinessYelpInfo(restaurantElement, name, address, city=
 		yelpPromise = getBusinessYelpInfoPromise(name, address, city, state, country)
 			.then((response) => {
 				if (response && response.hasOwnProperty("rating")){
+					star_container = restaurantElement.getElementsByClassName("yfm-star-container")[0];
+					star_container.innerText = "";
 					star_img = new Image();
+					star_img.classList = "yfm-star-img";
 					star_img.src = starImage(response.rating);
-					restaurantElement.append(star_img);
+					star_container.append(star_img);
 
-					rating_count = document.createTextNode(response.review_count);
-					restaurantElement.append(rating_count);
+					review_count = document.createElement("span")
+					review_count.classList = "yfm-star-review-count";
+					review_count_text = document.createTextNode(response.review_count + " ratings");
+					review_count.append(review_count_text);
+					star_container.append(review_count);
 
 					resolve(response);
 				}
 			})
-			.catch((error) => {reject(error)});
+			.catch((error) => {
+				console.log(error)
+				reject(error)
+			});
 	});
 }
 

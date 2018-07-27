@@ -1,3 +1,13 @@
 /**
  * Place your custom CSS styles here.
  **/
+.yfm-star-container {
+	min-height: 25px;
+	min-width: 1px;
+	color: #6f6b6b;
+	padding-top: 3px;
+}
+
+.yfm-star-review-count {
+	margin-left: .5em;
+}
